@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+.about-us {
+  height: 100vh;
+  width: 100%;
+  background-image: url("&Horizontal-image&");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.text-box {
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 700px;
+  text-align: left;
+  position: relative;
+  background: #ebebeb;
+}
+.text-box::before {
+    background: #fff;
+    content: "";
+}
+.text-box h1 {
+  font-size: 60px;
+  font-weight: 600;
+  margin-bottom: 10px
+}
+.text-box p {
+  font-size: 20px;
+  line-height: 25px;
+  letter-spacing: 1px;
+}
+.data {
+  margin-top: 30px;
+}
+.hire-btn {
+  background: #ebebeb;
+  color: #4777ff;
+  text-decoration: none;
+  padding: 12px 20px;
+  border: solid;
+  border-radius: 4px;
+  border-color: #4777ff;
+  font-size: 20px;
+  transition: 0.4s;
+  cursor: pointer;
+}
+.hire-btn:hover {
+  background: #0031c8;
+  color: white;
+  border-color: #0031c8;
+}
+</style>
+</head>
+<body>
+<section class="about-us">
+    <div class="text-box">
+      <h1>&Company-name&</h1>
+      <p>&Company-description& </p>
+      <div class="data">
+        <a href="#" class="hire-btn">Read More</a>
+      </div>
+    </div>
+</section>
+</body>
+</html>

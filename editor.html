@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adjusted Sidebar</title>
+    <style>
+        body {
+            font-family: 'Fira Sans', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .DisplayedHTML,
+        .sidebar {
+            background-color: #ffffff;
+            color: white;
+        }
+
+        .sidebar a {
+            color: #ddd;
+            transition: color 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #fff;
+        }
+
+        .sidebar label,
+        .sidebar input,
+        .sidebar button,
+        .sidebar textarea {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar label,
+        .sidebar input,
+        .sidebar button,
+        .sidebar textarea:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar button {
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .sidebar button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .openbtn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .openbtn:hover {
+            background-color: #444;
+        }
+
+        textarea {
+            background-color: #f8f8f8;
+            color: #4d4d4d;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            resize: none;
+        }
+
+        @media screen and (max-height: 450px) {
+            .sidebar {
+                padding-top: 15px;
+            }
+            .sidebar a {
+                font-size: 18px;
+            }
+        }
+
+        label {
+            display: block;
+            font: 1rem 'Fira Sans', sans-serif;
+            color: white;
+            margin: 0.4rem 0;
+        }
+
+        .pickfile {
+            position: relative;
+            bottom: 1px;
+        }
+
+        .Menu {
+            width: 15%;
+            height: 100%;
+            right: 0;
+            position: absolute;
+            background-color: rgb(66, 66, 66);
+        }
+
+        .DisplayedHTML {
+            width: 100%;
+            height: 100%;
+            left: 0;
+            position: absolute;
+        }
+
+        textarea {
+            position: relative;
+            width: 80%;
+            height: 75%;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            font-size: 16px;
+            resize: none;
+            left: 10%;
+        }
+
+        label, input {
+            position: relative;
+            left: 10%;
+        }
+
+        .SubmitChanges, .Download {
+            position: relative;
+            bottom: 1px;
+            margin-top: 5px;
+        }
+
+        .SubmitChanges {
+          margin-left: 15%;
+        }
+
+        .Download {
+          margin-left: 10px;
+        }
+
+        #SubmitChanges {
+            float: left;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, .75);
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px; /* Added padding for better spacing */
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+            padding: 10px 20px; /* Added padding for better spacing */
+        }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            font-size: 36px;
+            margin-right: 50px;
+        }
+
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #111;
+            color: white;
+            border: none;
+        }
+
+        .openbtn:hover {
+            background-color: #444;
+        }
+
+        #main {
+            transition: margin-right .5s;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            z-index: 2;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="display" class="DisplayedHTML" src="page.html"></iframe>
+    <div id="main">
+        <button class="openbtn" onclick="openNav()">☰ Open Editor</button>  
+    </div>
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <label for="file-input">Choose a File for an edit</label>
+        <input type="file" id="file-input" name="avatar" accept=".html"/>
+        <button class="SubmitChanges" id="submit">Submit</button>
+        <button class="Download" id="download">Download</button>
+        <textarea class="editmenu" id="editmenu"></textarea>
+    </div>
+
+    <script>
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var contents = e.target.result;
+                document.getElementById('display').srcdoc = contents;
+                document.getElementById('editmenu').value = contents;
+            };
+            reader.readAsText(file);
+        });
+
+        // Update iframe content on button click
+        document.getElementById('submit').addEventListener('click', function() {
+            var updatedContent = document.getElementById('editmenu').value;
+            document.getElementById('display').srcdoc = updatedContent; 
+        });
+
+        document.getElementById('download').addEventListener('click', function() {
+            var totalContent = document.getElementById('display').srcdoc;
+            // Create a file and put the content, name, and type
+            var file = new File(["\ufeff" + totalContent], 'index.html', {type: "text/plain;charset=UTF-8"});
+
+            // Create an ObjectURL in order to download the created file
+            var url = window.URL.createObjectURL(file);
+
+            // Create a hidden link, set the href, and click it
+            var a = document.createElement("a");
+            a.style = "display: none";
+            a.href = url;
+            a.download = file.name;
+            document.body.appendChild(a); // Append the anchor to the body
+            a.click();
+            window.URL.revokeObjectURL(url); 
+            document.body.removeChild(a); // Clean up and remove the anchor
+        });
+
+        function openNav() {
+          document.getElementById("mySidebar").style.width = "100%";
+          document.getElementById("main").style.marginRight = "0px";
+        }
+
+        function closeNav() {
+          document.getElementById("mySidebar").style.width = "0";
+          document.getElementById("main").style.marginRight= "0";
+        }
+    </script>
+</body>
+</html>

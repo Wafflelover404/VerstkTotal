@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {box-sizing: border-box;}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.header {
+  overflow: hidden;
+  padding: 20px 10px;
+  background-color: black;
+  position: fixed;
+  width: 100%;
+}
+
+.header a {
+  float: left;
+  color: white;
+  text-align: center;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 25px;
+  border-radius: 4px;
+}
+
+.header a:hover {
+  background-color: #ddd;
+
+}
+
+.header-right a:hover {
+  transition: color 0.3s ease-out, font-size 0.3s ease-out;
+  color: #494949;
+}
+
+.header-right {
+  float: right;
+}
+
+.header-left a:hover {
+  transition: color 0.3s ease-out, font-size 0.3s ease-out;
+  color: #494949;
+}
+
+.header-left {
+  float: left;
+}
+
+@media screen and (max-width: 500px) {
+  .header a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+
+  .header-right {
+    float: none;
+  }
+   .header-left {
+    float: none;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <a class="active" href="#home">Home</a>
+    <a href="#about">About</a>
+  </div>
+  <div class="header-right">
+    <a href="#contact">Contact</a>
+    <a href="#products">Products</a>
+  </div>
+</div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+.about-us {
+  background-image: url("&Horizontal-image&");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.text-box {
+  padding: 40px;
+  border-radius: 5px;
+  max-width: 1300px;
+  text-align: center;
+  position: relative;
+  z-index: 9999;
+    background: rgba(240, 240, 240, 0.1);
+}
+.text-box::before {
+    background: #fff;
+}
+.text-box h2 {
+  font-size: 70px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.text-box p {
+  font-size: 50px;
+  line-height: 60px;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+}
+.data {
+  margin-top: 40px;
+}
+.hire-btn {
+  background: #e63c74;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 30px;
+  transition: 0.5s;
+  cursor: pointer;
+}
+.hire-btn:hover {
+  background: #ff0055;
+}
+</style>
+</head>
+<body>
+<section class="about-us">
+    <div class="text-box">
+      <h2>&Company-name&</h2>
+      <p>&Company-description&</p>
+      <div class="data">
+        <a href="#" class="hire-btn">Read More</a>
+      </div>
+    </div>
+</section>
+</body>
+</html>

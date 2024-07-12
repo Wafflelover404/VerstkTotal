@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Copy",
+    "feather": "Copy",
+    "hasText": true,
+    "alwaysOn": true,
+    "commands": ["copyAll"],
+    "style": {"top": "0rem", "right": "0.4rem"}
+  },
+  {
+    "name": "Shortcuts",
+    "feather": "Type",
+    "class": "shortcuts-button",
+    "hasText": true,
+    "commands": ["toggleKeyboardShortcuts"],
+    "style": {"bottom": "60%", "right": "0.4rem"}
+  },
+  {
+    "name": "Collapse",
+    "feather": "Minimize2",
+    "hasText": true,
+    "commands": ["selectall", "toggleSplitSelectionIntoLines", "gotolineend", "del"],
+    "style": {"bottom": "50%", "right": "0.4rem"}
+  },
+  {
+    "name": "Save",
+    "feather": "Save",
+    "hasText": true,
+    "commands": ["save-state"],
+    "style": {"bottom": "40%", "right": "0.4rem"}
+  },
+  {
+    "name": "Run",
+    "feather": "Play",
+    "primary": true,
+    "hasText": true,
+    "showWithIcon": true,
+    "commands": ["submit"],
+    "style": {"bottom": "2%", "right": "0.4rem"}
+  },
+  {
+    "name": "Command",
+    "feather": "Terminal",
+    "primary": true,
+    "hasText": true,
+    "commands": ["openCommandPallete"],
+    "style": {"bottom": "20%", "right": "0.4rem"}
+  },
+  {
+    "name": "Ai Coder",
+    "feather": "Slack",
+    "primary": true,
+    "hasText": true,
+    "commands": ["assistant"],
+    "style": {"bottom": "30%", "right": "0.4rem"}
+  }
+]

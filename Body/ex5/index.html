@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+.about-us {
+  background-image: url("&Horizontal-image&");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.text-box {
+  padding: 40px;
+  border-radius: 5px;
+  max-width: 1300px;
+  text-align: center;
+  position: relative;
+  z-index: 9999;
+    background: rgba(240, 240, 240, 0.1);
+}
+.text-box::before {
+    background: #fff;
+}
+.text-box h2 {
+  font-size: 70px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.text-box p {
+  font-size: 50px;
+  line-height: 60px;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+}
+.data {
+  margin-top: 40px;
+}
+.hire-btn {
+  background: #e63c74;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 30px;
+  transition: 0.5s;
+  cursor: pointer;
+}
+.hire-btn:hover {
+  background: #ff0055;
+}
+</style>
+</head>
+<body>
+<section class="about-us">
+    <div class="text-box">
+      <h2>&Company-name&</h2>
+      <p>&Company-description&</p>
+      <div class="data">
+        <a href="#" class="hire-btn">Read More</a>
+      </div>
+    </div>
+</section>
+</body>
+</html>

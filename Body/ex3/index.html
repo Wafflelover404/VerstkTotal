@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>An About Us Page | CoderGirl</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+.about-us {
+  height: 100vh;
+  width: 100%;
+  background-image: url("&Horizontal-image&"); /* Replace with your image URL */
+  background-size: cover;
+  background-position: center;
+  display: flex; /* Added for positioning elements */
+  justify-content: center; /* Center elements horizontally */
+  align-items: center; /* Center elements vertically */
+}
+.text-box {
+  padding: 40px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 700px;
+  text-align: center; /* Center text content inside the box */
+  position: relative; /* Required for z-index to work */
+  z-index: 9999; /* Any high value to ensure it's on top */
+    background: rgba(255, 255, 255, 0.5); /* This makes the background white with 50% opacity */
+}
+.text-box::before {
+    background: #fff;
+    content: "";
+}
+.text-box h2 {
+  font-size: 50px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.text-box p {
+  font-size: 18px;
+  line-height: 25px;
+  letter-spacing: 1px;
+}
+.data {
+  margin-top: 30px;
+}
+.hire-btn {
+  background: #4777ff;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: 0.5s;
+  cursor: pointer;
+}
+.hire-btn:hover {
+  background: #0031c8;
+}
+</style>
+</head>
+<body>
+<section class="about-us">
+    <div class="text-box">
+      <h2>&Company-name&</h2>
+      <p>&Company-description& </p>
+      <div class="data">
+        <a href="#" class="hire-btn">Learn More</a>
+      </div>
+    </div>
+</section>
+</body>
+</html>
