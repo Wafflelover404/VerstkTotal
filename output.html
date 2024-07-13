@@ -1,64 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style type="text/css">
-		body {
-			margin: auto;
-		}
-		header {
-			display: flex;
-			width: 100%;
-			height: 7vh;
-			align-items: center;
-			justify-content: space-between;
-			background-color: black;
-			position: fixed;
-		}
-		a {
-			font-size: 100%;
-			color: gray;
-			text-decoration: none;
-			transition: color 0.3s ease-out, font-size 0.3s ease-out; /* Add this line */
-		}
+    <title>Your Website Title</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="This is a simple HTML header">
+    <meta name="keywords" content="HTML, CSS, JavaScript">
+    <meta name="author" content="Your Name">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
 
-		a:hover {
-			color: white;
-			font-size: 105%;
-			font-weight: bold;
-		}
-		.bl{
-			display: flex;
-			justify-content: space-around;
-			width: 60%;
-		}
-		.logo-header {
-			height: 100%;
-			width: 15%;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-		.logo-header img {
-			height: 80%;
-		}
+        .navbar {
+            overflow: hidden;
+            background-color: #333;
+            background-color: black;
+        }
 
-	</style>
-</head>	
+        .navbar a {
+            float: left;
+            display: block;
+            color: whitesmoke;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            transition: color 0.3s ease-out, font-size 0.3s ease-out;
+            font-size: 20px;
+            color: white;
+        }
+    </style>
+</head>
 <body>
-	<header>
-		<div class="logo-header" >
-			<img src="logo.png">
-		</div>
-		<div class="bl">
-			<a href="">Home</a>
-			<a href="">Products</a>
-			<a href="">Learn more</a>
-			<a href="">About us</a>
-			<a href="">Contact us</a>
-		</div>
-	</header>
+    <div class="navbar">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+    </div>
 </body>
 </html>
 <!DOCTYPE html>
@@ -67,6 +48,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap");
 * {
   margin: 0;
   padding: 0;
@@ -74,65 +56,60 @@
   font-family: "Poppins", sans-serif;
 }
 .about-us {
-  height: 100vh;
-  width: 100%;
   background-image: url("&Horizontal-image&");
   background-size: cover;
   background-position: center;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
 }
 .text-box {
   padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  max-width: 700px;
-  text-align: left;
+  border-radius: 5px;
+  max-width: 1300px;
+  text-align: center;
   position: relative;
-  background: #ebebeb;
+  z-index: 9999;
+    background: rgba(240, 240, 240, 0.1);
 }
 .text-box::before {
     background: #fff;
-    content: "";
 }
-.text-box h1 {
-  font-size: 60px;
+.text-box h2 {
+  font-size: 70px;
   font-weight: 600;
-  margin-bottom: 10px
+  margin-bottom: 10px;
 }
 .text-box p {
-  font-size: 20px;
-  line-height: 25px;
+  font-size: 50px;
+  line-height: 60px;
   letter-spacing: 1px;
+  word-wrap: break-word;
 }
 .data {
-  margin-top: 30px;
+  margin-top: 40px;
 }
 .hire-btn {
-  background: #ebebeb;
-  color: #4777ff;
+  background: #e63c74;
+  color: #fff;
   text-decoration: none;
+  border: none;
   padding: 12px 20px;
-  border: solid;
   border-radius: 4px;
-  border-color: #4777ff;
-  font-size: 20px;
-  transition: 0.4s;
+  font-size: 30px;
+  transition: 0.5s;
   cursor: pointer;
 }
 .hire-btn:hover {
-  background: #0031c8;
-  color: white;
-  border-color: #0031c8;
+  background: #ff0055;
 }
 </style>
 </head>
 <body>
 <section class="about-us">
     <div class="text-box">
-      <h1>&Company-name&</h1>
-      <p>&Company-description& </p>
+      <h2>Waffles</h2>
+      <p>At Waffles, we pride ourselves on serving delicious, freshly made waffles to our valued customers every day. Our commitment to quality and customer satisfaction sets us apart in the food industry.</p>
       <div class="data">
         <a href="#" class="hire-btn">Read More</a>
       </div>

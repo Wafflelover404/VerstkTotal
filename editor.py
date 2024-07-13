@@ -28,6 +28,24 @@ def auto_download_html(object_to_download, download_filename):
     """
     return html
 
+# Initialize session state
+if 'uploaded_file_content' not in st.session_state:
+    st.session_state.uploaded_file_content = None
+if 'height' not in st.session_state:
+    st.session_state.height = [19, 22]
+if 'language' not in st.session_state:
+    st.session_state.language = "html"
+if 'theme' not in st.session_state:
+    st.session_state.theme = "default"
+if 'shortcuts' not in st.session_state:
+    st.session_state.shortcuts = "vscode"
+if 'focus' not in st.session_state:
+    st.session_state.focus = True
+if 'wrap' not in st.session_state:
+    st.session_state.wrap = True
+if 'edited_content' not in st.session_state:
+    st.session_state.edited_content = None
+
 # Load custom buttons from JSON file
 with open('resources/example_custom_buttons_bar_alt.json') as json_button_file_alt:
     custom_buttons_alt = json.load(json_button_file_alt)
@@ -62,22 +80,20 @@ btn_settings_editor_btns = [{
     "style": {"bottom": "0rem", "right": "0.4rem"}
   }]
 
-height = [19, 22]
-language="html"
-theme="default"
-shortcuts="vscode"
-focus=True
-wrap=True
 btns = custom_buttons_alt
 
-st.title("An Advanced Page Editor")
-st.markdown("***Edit*** *With* ***Ease***")
+st.title("VerstkEdit")
+st.markdown("A simple website editor")
 
 uploaded_file = st.file_uploader("Choose your HTML file.")
 
 if uploaded_file is not None:
-    bytes_data = uploaded_file.read().decode('utf-8')
-    st.write("filename:", uploaded_file.name)
+    st.session_state.uploaded_file_content = uploaded_file.read().decode('utf-8')
+    st.session_state.edited_content = st.session_state.uploaded_file_content
+
+if st.session_state.edited_content is not None:
+    bytes_data = st.session_state.edited_content
+    st.write("filename:", uploaded_file.name if uploaded_file else "Unknown")
     st.write("Original content:")
 
     st.write("")
@@ -86,24 +102,20 @@ if uploaded_file is not None:
         col_c.markdown('<div style="height: 2.5rem;"><br/></div>', unsafe_allow_html=True)
         col_cb.markdown('<div style="height: 2.5rem;"><br/></div>', unsafe_allow_html=True)
 
-        height_type = col_a.selectbox("height format:", ["css", "max lines", "min-max lines"], index=2)
-        if height_type == "css":
-            height = col_b.text_input("height (CSS):", "400px")
-        elif height_type == "max lines":
-            height = col_b.slider("max lines:", 1, 40, 22)
-        elif height_type == "min-max lines":
-            height = col_b.slider("min-max lines:", 1, 40, (11, 15))
+        height_type = col_a.selectbox("height format:", ["min-max lines"])
+        if height_type == "min-max lines":
+            st.session_state.height = col_b.slider("min-max lines:", 1, 40, st.session_state.height)
 
         col_d, col_e, col_f = st.columns([1,1,1])
-        language = col_d.selectbox("lang:", mode_list, index=mode_list.index("html"))
-        theme = col_e.selectbox("theme:", ["default", "light", "dark", "contrast"])
-        shortcuts = col_f.selectbox("shortcuts:", ["emacs", "vim", "vscode", "sublime"], index=2)
-        focus = col_c.checkbox("focus", True)
-        wrap = col_cb.checkbox("wrap", True)
+        st.session_state.language = col_d.selectbox("lang:", mode_list, index=mode_list.index(st.session_state.language))
+        st.session_state.theme = col_e.selectbox("theme:", ["default", "light", "dark", "contrast"], index=["default", "light", "dark", "contrast"].index(st.session_state.theme))
+        st.session_state.shortcuts = col_f.selectbox("shortcuts:", ["emacs", "vim", "vscode", "sublime"], index=["emacs", "vim", "vscode", "sublime"].index(st.session_state.shortcuts))
+        st.session_state.focus = col_c.checkbox("focus", st.session_state.focus)
+        st.session_state.wrap = col_cb.checkbox("wrap", st.session_state.wrap)
 
     # Construct props dictionary (->Ace Editor)
     ace_props = {"style": {"borderRadius": "0px 0px 8px 8px"}}
-    response_dict = code_editor(bytes_data,  height=height, lang=language, theme=theme, shortcuts=shortcuts, focus=focus, buttons=btns, info=info_bar, props=ace_props, options={"wrap": wrap}, allow_reset=True, key="code_editor_demo")
+    response_dict = code_editor(bytes_data,  height=st.session_state.height, lang=st.session_state.language, theme=st.session_state.theme, shortcuts=st.session_state.shortcuts, focus=st.session_state.focus, buttons=btns, info=info_bar, props=ace_props, options={"wrap": st.session_state.wrap}, allow_reset=True, key="code_editor_demo")
 
     if len(response_dict['id']) != 0 and (response_dict['type'] == "selection"):
         st.write(response_dict)
@@ -113,6 +125,7 @@ if uploaded_file is not None:
         print("Running !!!")
         st.header("Page preview")
         st.components.v1.html(response_dict['text'])
+        st.session_state.edited_content = response_dict['text']
 
     if response_dict['type'] == "saved":
         print("Downloading !!!")
