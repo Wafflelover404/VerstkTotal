@@ -5,6 +5,18 @@ import subprocess
 
 st.title("VerstkAi")
 st.subheader("A simple Website generator")
+input_token = ""
+
+with st.expander('Ai configuration: '):
+    st.markdown("Configure your <a href=https://huggingface.co/settings/tokens>HuggingFace token</a>.",
+                help="User Access Tokens are the preferred way to authenticate an application or notebook to Hugging Face services. You can manage your access tokens in your settings.",
+                unsafe_allow_html=True)
+    input_token = st.text_area("Enter your HuggingFace token 🤗")
+
+    if st.button("Submit !"):
+        st.session_state.hf_token = input_token
+        st.write(f"Your current HuggingFace token is: {st.session_state.hf_token}")
+
 
 # Create an input field for the company name
 company_name = st.text_input("Enter the company name")
@@ -21,7 +33,7 @@ if st.button('Generate'):
     if (company_name and company_description):
 
         # Prepare the inputs
-        input_data = f'{company_name}\n{company_description}\n'
+        input_data = f'{input_token}\n{company_name}\n{company_description}\n'
         # Start the script
         process = subprocess.Popen(['python3', 'run.py'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
 

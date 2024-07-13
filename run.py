@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import os
 import random
 
+hf_token = input("Token ~>")
+
 import text_writer  # For page's text
 import get_image_topic  # For image's topic
 from search_image import get_image_urls  # Image search function
@@ -24,10 +26,14 @@ os.system("python3 merge.py")  # Merge HTML files to get started"
 
 company_name_inp = input("Company name ~> ")
 company_desc_inp = input("Company Description ~> ")
+
+print("Token: ", hf_token)
+print("Name: ", company_name_inp)
+print("Desc:", company_desc_inp)
 topic = f'{company_name_inp} - {company_desc_inp}'
 
 try:
-    response = text_writer.send(topic)
+    response = text_writer.send(topic, hf_token)
     if response != "Error":
         print("Text writing successfully!", response)
 

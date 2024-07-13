@@ -1,12 +1,9 @@
 import requests
 import re
 
-hf_token = "" # replace with your HuggingFace API key
-
 API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-headers = {"Authorization": f"Bearer {hf_token}"}
 
-def query(payload):
+def query(payload, headers):
   response = requests.post(API_URL, headers=headers, json=payload)
   return response.json()
 
@@ -15,7 +12,9 @@ def replace_assistant(strin):
   e = re.sub(r'(?<=\?waffle\?)\S+', '', e)
   return e.strip()
 
-def send(prompt):
+
+def send(request, hf_token):
+  headers = {"Authorization": f"Bearer {hf_token}"}
   for i in range(0, 10):
     try:
       prompt = f"""
@@ -31,7 +30,7 @@ def send(prompt):
         "inputs": prompt,
         "parameters": {"max_new_tokens": 8000, "use_cache": False, "max_time": 120.0},
         "options": {"wait_for_model": True}
-      })
+      }, headers)
       full_response = replace_assistant(response[0]["generated_text"])
       return full_response
       break
@@ -41,3 +40,5 @@ def send(prompt):
   return "Error"
 
 # Get user prompt and optional requested information
+
+

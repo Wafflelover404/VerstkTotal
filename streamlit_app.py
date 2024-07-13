@@ -4,6 +4,7 @@ import os
 # Define paths to the pages
 PAGE_PATHS = {
     "Welcome !": "welcome_page.py",
+    "Configure": "config.py",
     "Create your page": "interface.py",
     "Redact your page": "editor.py"
 }
