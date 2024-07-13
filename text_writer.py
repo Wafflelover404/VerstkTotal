@@ -1,7 +1,9 @@
 import requests
 import re
+import streamlit as st
 
-hf_token = "" # replace with your HuggingFace API key
+hf_token = st.session_state.get("hf_token", "") # replace with your HuggingFace API key
+print(hf_token)
 
 API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
 headers = {"Authorization": f"Bearer {hf_token}"}

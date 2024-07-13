@@ -22,8 +22,9 @@ if st.button('Generate'):
 
         # Prepare the inputs
         input_data = f'{company_name}\n{company_description}\n'
-        # Start the script
-        process = subprocess.Popen(['python3', 'run.py'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+        
+        # Start the script with command-line arguments
+        process = subprocess.Popen(['python3', 'streamlit', 'run', 'run.py', company_name, company_description], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         # Provide the input and wait for the process to complete
         stdout, stderr = process.communicate(input=input_data)
