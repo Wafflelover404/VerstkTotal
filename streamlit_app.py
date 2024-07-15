@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(layout="wide")
 
 # Initialize session state with default values if they don't exist
 if 'hf_token' not in st.session_state:

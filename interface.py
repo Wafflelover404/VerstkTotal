@@ -87,9 +87,6 @@ if st.button('Generate'):
             html_string = f.read()
             st.session_state.generated_html = html_string
 
-        # Display the HTML file
-        components.html(html_string, height=900)
-
         # Create a button for exporting the HTML file
         # Check if the file exists
         if os.path.exists("output.html"):
@@ -111,9 +108,6 @@ if st.button('Generate'):
         # Open error, cause input's empty
         with open('error.html', 'r') as f:
             html_string = f.read()
-
-        # Display the HTML file
-        components.html(html_string, height=900)
 
 # Display the generated HTML if it exists in session state
 if st.session_state.generated_html:
