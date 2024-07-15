@@ -124,7 +124,7 @@ if st.session_state.edited_content is not None:
         print(response_dict)
         print("Running !!!")
         st.header("Page preview")
-        st.components.v1.html(response_dict['text'])
+        st.components.v1.html(response_dict['text'], height=750)
         st.session_state.edited_content = response_dict['text']
 
     if response_dict['type'] == "saved":
