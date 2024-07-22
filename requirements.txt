@@ -1,1 +1,2 @@
 streamlit_code_editor
+bs4
