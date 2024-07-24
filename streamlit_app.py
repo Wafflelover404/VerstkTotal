@@ -13,8 +13,9 @@ if 'context' not in st.session_state:
 PAGE_PATHS = {
     "Welcome !": "welcome_page.py",
     "Configure": "config.py",
-    "Create your page": "interface.py",
-    "Redact your page": "editor.py"
+    "Generate a template": "interface.py",
+    "Construct a site": "coming_soon.py",
+    "Edit your site": "editor.py"
 }
 
 def load_page(path):

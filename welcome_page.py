@@ -16,4 +16,4 @@ with st.container():
     gen.link_button("VerstkaGen repository", "https://github.com/Wafflelover404/VerstkaGen")
     edit.link_button("VerstkEdit repository", "https://github.com/Wafflelover404/VerstkEdit")
 st.subheader("Contact us:")
-st.markdown("- <a href='ourmail...'>Official Mail</a>", unsafe_allow_html=True)
+st.link_button("Contact us !", "https://google.com")
