@@ -190,17 +190,22 @@ if st.session_state.account:
     with st.expander("Existing projects"):
         with sqlite3.connect(db_path) as db:
             cursor = db.cursor()
-            file_ids = get_file_ids_by_user_id(cursor, get_user_id_by_username(cursor, st.session_state.account))
-            for file_id in file_ids:
-                file_json_str = get_file_data_as_json(cursor, file_id)
-                file_json = json.loads(file_json_str)  # Parse the JSON string into a dictionary
-                cursor.execute("SELECT filename FROM files WHERE file_id = ?", (file_id,))
-                filename = cursor.fetchone()[0]
+            user_id = get_user_id_by_username(cursor, st.session_state.account)
+            file_ids = get_file_ids_by_user_id(cursor, user_id)
+            
+            if file_ids:
+                # Create tabs for each file ID
+                tabs = [f"File ID: {file_id}" for file_id in file_ids]
+                selected_tab = st.tabs(tabs)
                 
-                # Display filename and its content
-                st.write(f"**Filename**: {filename}")
-                st.write(f"**File ID**: {file_id}")
-                st.write("**File contents:**")
-                st.code(file_json["content"], line_numbers=True)
-                st.markdown("---")  # Add a divider line between files
+                for file_id, tab_name in zip(file_ids, tabs):
+                    with selected_tab[tabs.index(tab_name)]:
+                        file_json_str = get_file_data_as_json(cursor, file_id)
+                        file_json = json.loads(file_json_str)  # Parse the JSON string into a dictionary
+                        st.write(f"**Filename**: {file_json['filename']}")
+                        st.write(f"**File ID**: {file_id}")
+                        st.write("**File contents:**")
+                        st.code(file_json["content"], line_numbers=True)
+            else:
+                st.write("No files found for this user.")
         
