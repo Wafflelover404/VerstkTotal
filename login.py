@@ -1,6 +1,7 @@
 import streamlit as st
 import sqlite3
 import os
+import json
 
 # Set page configuration
 st.set_page_config(page_title="Authentication", layout="centered")
@@ -28,6 +29,30 @@ def username_exists(cursor, username):
 def verify_login(cursor, username, password):
     cursor.execute("SELECT 1 FROM users WHERE username = ? AND password = ?", (username, password))
     return cursor.fetchone() is not None
+
+def get_user_id_by_username(cursor, username):
+    cursor.execute("SELECT user_id FROM users WHERE username = ?", (username,))
+    result = cursor.fetchone()
+    return result[0] if result else None
+
+def get_file_ids_by_user_id(cursor, user_id):
+    cursor.execute("SELECT file_id FROM user_files WHERE user_id = ?", (user_id,))
+    result = cursor.fetchall()
+    return [row[0] for row in result] if result else []
+
+def get_file_data_as_json(cursor, file_id):
+    cursor.execute("SELECT filename, source FROM files WHERE file_id = ?", (file_id,))
+    result = cursor.fetchone()
+    
+    if result:
+        file_data = {
+            "file_id": file_id,
+            "filename": result[0],
+            "content": result[1].decode('utf-8') if isinstance(result[1], bytes) else result[1]
+        }
+        return json.dumps(file_data, indent=4)
+    else:
+        return json.dumps({"error": "File not found"}, indent=4)
 
 # Ensure the database directory exists
 db_path = './Data/DB/app.db'
@@ -82,10 +107,10 @@ with tab1:
                     st.error("The username is occupied.")
                 else:
                     cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (create_username, create_password))
-                    db.commit()
-                    st.success("Account created successfully!")
                     st.session_state.account = create_username
-                    debug_print(f"User: {create_username}, Password: {create_password} added to the database.")
+                    st.success("Account created successfully!")
+                    debug_print(f"User: {create_username}, ID: {get_user_id_by_username(cursor, st.session_state.account)} added to the database.")
+                    db.commit()
         else:
             st.error("Please provide both a username and a password.")
 
@@ -121,8 +146,11 @@ st.divider()
 if st.session_state.account:
     st.header("My projects")
     st.write(f"Current account: {st.session_state.account}")
+
     with st.expander("Add files manually"):
         tab1, tab2 = st.tabs(["Upload file", "Write file manually"])
+        
+        # Tab 1: Upload a file
         with tab1:
             uploaded_file = st.file_uploader(label="Upload your html file here.")
             if uploaded_file is not None:
@@ -138,17 +166,41 @@ if st.session_state.account:
                         cursor = db.cursor()
                         cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, file_content))
                         file_id = cursor.lastrowid
+                        cursor.execute("INSERT INTO user_files (user_id, file_id) VALUES (?, ?)", (get_user_id_by_username(cursor, st.session_state.account), file_id))
                         db.commit()
                         st.success(f"File added to the database with file_id: {file_id}")
+        
+        # Tab 2: Write file manually
         with tab2:
-            st.write("Enter data.")
-            file_name = st.text_input("filename", key="manual_filename")
-            file_cont = st.text_area("content", key="manual_content")
+            st.write("Enter data manually.")
+            filename = st.text_input("Filename", key="manual_filename")
+            filecont = st.text_area("Content", key="manual_content")
+            
             if st.button("Add to database", key="manual_button"):
-                with sqlite3.connect(db_path) as db:
-                    cursor = db.cursor()
-                    cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (file_name, file_cont))
-                    file_id = cursor.lastrowid
-                    db.commit()
-                    st.success(f"File added to the database with file_id: {file_id}")
+                if filename and filecont:
+                     with sqlite3.connect(db_path) as db:
+                        cursor = db.cursor()
+                        cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, filecont))
+                        file_id = cursor.lastrowid
+                        cursor.execute("INSERT INTO user_files (user_id, file_id) VALUES (?, ?)", (get_user_id_by_username(cursor, st.session_state.account), file_id))
+                        db.commit()
+                        st.success(f"File added to the database with file_id: {file_id}")
+
+
+    with st.expander("Existing projects"):
+        with sqlite3.connect(db_path) as db:
+            cursor = db.cursor()
+            file_ids = get_file_ids_by_user_id(cursor, get_user_id_by_username(cursor, st.session_state.account))
+            for file_id in file_ids:
+                file_json_str = get_file_data_as_json(cursor, file_id)
+                file_json = json.loads(file_json_str)  # Parse the JSON string into a dictionary
+                cursor.execute("SELECT filename FROM files WHERE file_id = ?", (file_id,))
+                filename = cursor.fetchone()[0]
+                
+                # Display filename and its content
+                st.write(f"**Filename**: {filename}")
+                st.write(f"**File ID**: {file_id}")
+                st.write("**File contents:**")
+                st.code(file_json["content"], line_numbers=True)
+                st.markdown("---")  # Add a divider line between files
         
