@@ -12,6 +12,7 @@ if 'context' not in st.session_state:
 # Define paths to the pages
 PAGE_PATHS = {
     "Welcome !": "welcome_page.py",
+    "Login page": "login.py",
     "Configure": "config.py",
     "Generate a template": "interface.py",
     "Construct a site": "coming_soon.py",

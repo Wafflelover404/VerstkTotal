@@ -1,10 +1,8 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import sqlite3
 import os
 import json
-
-# Set page configuration
-st.set_page_config(page_title="Authentication", layout="centered")
 
 # Create a header for the app
 st.header("Authentication")
@@ -96,7 +94,7 @@ with tab1:
     create_username = st.text_input("Create a unique username", key="create_username")
     create_password = st.text_input("Create a password", type="password", key="create_password")
     
-    if len(create_password) < 8:
+    if len(create_password) < 8 and create_password != "":
         st.warning("Your password is shorter than 8 symbols.")
     
     if st.button("Create account"):
@@ -202,10 +200,17 @@ if st.session_state.account:
                     with selected_tab[tabs.index(tab_name)]:
                         file_json_str = get_file_data_as_json(cursor, file_id)
                         file_json = json.loads(file_json_str)  # Parse the JSON string into a dictionary
-                        st.write(f"**Filename**: {file_json['filename']}")
                         st.write(f"**File ID**: {file_id}")
+                        st.write(f"**Filename**: {file_json['filename']}")
                         st.write("**File contents:**")
                         st.code(file_json["content"], line_numbers=True)
+                        # Create a button for downloading the file
+                        st.download_button(
+                            label="Export",
+                            data=file_json["content"],
+                            file_name=file_json['filename'],
+                            key=f"Download from bd{file_id}"
+                        )
             else:
                 st.write("No files found for this user.")
         
