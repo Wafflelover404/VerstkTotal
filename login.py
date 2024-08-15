@@ -3,6 +3,7 @@ import streamlit.components.v1 as components
 import sqlite3
 import os
 import json
+import bcrypt
 
 # Create a header for the app
 st.header("Authentication")
@@ -18,6 +19,19 @@ if 'account' not in st.session_state:
 def debug_print(message):
     st.text(message)
 
+# generating the salt (Global only)
+salt = bcrypt.gensalt() 
+
+def hash_it_quick(password):
+    # converting password to array of bytes 
+    bytes = password.encode('utf-8') 
+
+    # Hashing the password 
+    hash = bcrypt.hashpw(bytes, salt)
+
+    # Return result 
+    return hash
+
 # Function to check if username exists
 def username_exists(cursor, username):
     cursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
@@ -25,8 +39,12 @@ def username_exists(cursor, username):
 
 # Function to verify login credentials
 def verify_login(cursor, username, password):
-    cursor.execute("SELECT 1 FROM users WHERE username = ? AND password = ?", (username, password))
-    return cursor.fetchone() is not None
+    cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
+    result = cursor.fetchone()
+    if result:
+        stored_hashed_password = result[0]
+        return bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password)
+    return False
 
 def get_user_id_by_username(cursor, username):
     cursor.execute("SELECT user_id FROM users WHERE username = ?", (username,))
@@ -104,7 +122,8 @@ with tab1:
                 if username_exists(cursor, create_username):
                     st.error("The username is occupied.")
                 else:
-                    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (create_username, create_password))
+                    hashed_password = hash_it_quick(create_password)
+                    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (create_username, hashed_password))
                     st.session_state.account = create_username
                     st.success("Account created successfully!")
                     debug_print(f"User: {create_username}, ID: {get_user_id_by_username(cursor, st.session_state.account)} added to the database.")
@@ -213,4 +232,3 @@ if st.session_state.account:
                         )
             else:
                 st.write("No files found for this user.")
-        
