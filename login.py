@@ -20,7 +20,7 @@ def debug_print(message):
     st.text(message)
 
 # generating the salt (Global only)
-salt = bcrypt.gensalt() 
+salt = st.session_state.salt()
 
 def hash_it_quick(password):
     # converting password to array of bytes 
