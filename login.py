@@ -20,7 +20,7 @@ def debug_print(message):
     st.text(message)
 
 # generating the salt (Global only)
-salt = st.session_state.salt()
+salt = st.secret["salt"]
 
 def hash_it_quick(password):
     # converting password to array of bytes 
