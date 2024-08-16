@@ -20,7 +20,7 @@ def debug_print(message):
     st.text(message)
 
 # Access via st.secrets dictionary
-salt = st.secrets["salt"]
+salt = st.secrets["salt"].encode('utf-8')  # Convert salt to bytes
 print(salt)
 
 def hash_it_quick(password):
