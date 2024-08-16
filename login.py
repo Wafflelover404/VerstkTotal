@@ -19,8 +19,8 @@ if 'account' not in st.session_state:
 def debug_print(message):
     st.text(message)
 
-# generating the salt (Global only)
-salt = st.secret["salt"]
+# Access via st.secrets dictionary
+salt = st.secrets["salt"]
 
 def hash_it_quick(password):
     # converting password to array of bytes 
