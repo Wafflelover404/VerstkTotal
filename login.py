@@ -21,6 +21,7 @@ def debug_print(message):
 
 # Access via st.secrets dictionary
 salt = st.secrets["salt"]
+print(salt)
 
 def hash_it_quick(password):
     # converting password to array of bytes 
