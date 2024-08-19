@@ -15,6 +15,10 @@ tab1, tab2 = st.tabs(["Create new account", "Login to existing account"])
 if 'account' not in st.session_state:
     st.session_state.account = ""
 
+# Initialize session state
+if 'account_id' not in st.session_state:
+    st.session_state.account_id = ""
+
 # Debugging function
 def debug_print(message):
     st.text(message)
@@ -76,6 +80,10 @@ db_path = './Data/DB/app.db'
 if not os.path.exists(os.path.dirname(db_path)):
     os.makedirs(os.path.dirname(db_path))
 
+# Initialize session state
+if 'db_path' not in st.session_state:
+    st.session_state.db_path = db_path
+
 # Create or connect to the database and create tables
 def initialize_database(db_path):
     with sqlite3.connect(db_path) as db:
@@ -125,8 +133,9 @@ with tab1:
                 else:
                     hashed_password = hash_it_quick(create_password)
                     cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (create_username, hashed_password))
-                    st.session_state.account = create_username
                     st.success("Account created successfully!")
+                    st.session_state.account = create_username
+                    st.session_state.account_id = get_user_id_by_username(cursor, st.session_state.account)
                     debug_print(f"User: {create_username}, ID: {get_user_id_by_username(cursor, st.session_state.account)} added to the database.")
                     db.commit()
         else:
@@ -145,6 +154,7 @@ with tab2:
                 if verify_login(cursor, login_username, login_password):
                     st.success("Logged in successfully!")
                     st.session_state.account = login_username
+                    st.session_state.account_id = get_user_id_by_username(cursor, st.session_state.account)
                 else:
                     st.error("Invalid username or password.")
         else:
@@ -160,6 +170,7 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 st.divider()
+
 
 if st.session_state.account:
     st.header("My projects")
@@ -224,12 +235,19 @@ if st.session_state.account:
                         st.write(f"**Filename**: {file_json['filename']}")
                         st.write("**File contents:**")
                         st.code(file_json["content"], line_numbers=True)
-                        # Create a button for downloading the file
-                        st.download_button(
-                            label="Export",
-                            data=file_json["content"],
-                            file_name=file_json['filename'],
-                            key=f"Download from bd{file_id}"
-                        )
+                        btn1, btn2 = st.columns(2)
+                        with btn1:
+                            # Create a button for downloading the file
+                            if st.download_button(
+                                    label="Export",
+                                    data=file_json["content"],
+                                    file_name=file_json['filename'],
+                                    key=f"Download from bd{file_id}"
+                                ):
+                                st.success("Download started !")
+                        with btn2:
+                            if st.button(label="Edit", help="Open this file in code editor", key=f"{file_id}_export"):
+                                st.session_state.edited_content = file_json["content"]
+                                st.success("Opened in Web Editor !")
             else:
                 st.write("No files found for this user.")

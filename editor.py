@@ -2,6 +2,7 @@ import json
 import streamlit as st
 from code_editor import code_editor
 import base64
+import sqlite3
 
 def auto_download_html(object_to_download, download_filename):
     b64 = base64.b64encode(object_to_download.encode()).decode()
@@ -45,6 +46,8 @@ if 'wrap' not in st.session_state:
     st.session_state.wrap = True
 if 'edited_content' not in st.session_state:
     st.session_state.edited_content = None
+if 'account' not in st.session_state:
+    st.session_state.account = ""
 
 # Load custom buttons from JSON file
 with open('resources/example_custom_buttons_bar_alt.json') as json_button_file_alt:
@@ -127,6 +130,31 @@ if st.session_state.edited_content is not None:
         st.components.v1.html(response_dict['text'], height=750)
         st.session_state.edited_content = response_dict['text']
 
-    if response_dict['type'] == "saved":
-        print("Downloading !!!")
-        st.components.v1.html(auto_download_html(response_dict['text'], "output.html"), height=0, width=0)
+    btn1, btn2 = st.columns(2)
+
+    with btn1:
+        with st.popover("Save to account"):
+            if st.session_state.account != "" and st.session_state.account is not None:
+                filename = st.text_input(label="Enter filename", key='filename1')
+                if st.button(label="Submit"):
+                    with sqlite3.connect(st.session_state.db_path) as db:
+                        cursor = db.cursor()
+                        cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, st.session_state.edited_content))
+                        file_id = cursor.lastrowid
+                        cursor.execute("INSERT INTO user_files (user_id, file_id) VALUES (?, ?)", (st.session_state.account_id, file_id))
+                        db.commit()
+                    st.success(f"File added to the database with file_id: {file_id}")
+                    st.success("Saved to your account. Visit the login page to see.")
+            else:
+                st.error("Login to save your files.")
+
+    with btn2:
+        with st.popover("Export"):
+            filename = st.text_input(label="Enter filename", key='filename2')
+            if st.download_button(
+                label="Export",
+                data=st.session_state.edited_content,
+                file_name=filename,
+                key=f"Download"
+            ):
+                st.success("Download started!")

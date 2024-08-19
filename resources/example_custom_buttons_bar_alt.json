@@ -23,7 +23,7 @@
     "style": {"bottom": "50%", "right": "0.4rem"}
   },
   {
-    "name": "Save",
+    "name": "Save to account",
     "feather": "Save",
     "hasText": true,
     "commands": ["save-state"],

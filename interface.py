@@ -25,6 +25,7 @@ def replace_text(old_text, new_text):
 
 st.title("VerstkAi")
 st.subheader("A simple Website generation engine")
+st.warning("Make sure you configured tokens for engine to work properly")
 
 # Initialize session state variables
 if 'company_name' not in st.session_state:
@@ -87,23 +88,6 @@ if st.button('Generate'):
             html_string = f.read()
             st.session_state.generated_html = html_string
 
-        # Create a button for exporting the HTML file
-        # Check if the file exists
-        if os.path.exists("output.html"):
-            # Read the file
-            with open("output.html", "r") as file:
-                file_content = file.read()
-
-            # Create a button for downloading the file
-            st.download_button(
-                label="Export",
-                data=file_content,
-                file_name="output.html",
-                mime="text/html",
-            )
-        else:
-            st.write("The file output.html does not exist in the current directory.")
-
     else:
         # Open error, cause input's empty
         with open('error.html', 'r') as f:
@@ -112,3 +96,27 @@ if st.button('Generate'):
 # Display the generated HTML if it exists in session state
 if st.session_state.generated_html:
     components.html(st.session_state.generated_html, height=900)
+
+
+# Check if the file exists
+if os.path.exists("output.html"):
+    # Read the file
+    with open("output.html", "r") as file:
+        file_content = file.read()
+
+    btn1, btn2 = st.columns(2)
+    with btn1:
+        # Create a button for exporting the HTML file
+        st.download_button(
+            label="Export",
+            data=file_content,
+            file_name="output.html",
+            mime="text/html",
+        )
+        st.success("Download started !")
+    with btn2:
+        if st.button(label="Edit", help="Open this file in code editor"):
+            st.session_state.edited_content = file_content
+            st.success("Opened in Web Editor !")
+else:
+    st.write("The file output.html does not exist in the current directory.")
