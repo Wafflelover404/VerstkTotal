@@ -25,7 +25,6 @@ def debug_print(message):
 
 # Access via st.secrets dictionary
 salt = st.secrets["salt"].encode('utf-8')  # Convert salt to bytes
-print(salt)
 
 def hash_it_quick(password):
     # converting password to array of bytes 
