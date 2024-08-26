@@ -6,10 +6,15 @@ import streamlit as st
 import streamlit.components.v1 as components
 import os
 import subprocess
+import sqlite3
 
 import text_writer  # For page's text
 import get_image_topic  # For image's topic
 from search_image import get_image_urls  # Image search function
+
+# Initialize session state
+if 'account' not in st.session_state:
+    st.session_state.account = ""
 
 def replace_text(old_text, new_text):
     path = "output.html"
@@ -45,6 +50,8 @@ if st.button('Generate'):
     # When pressed, the field content will be written to the session state variables
     st.session_state.company_name = company_name
     st.session_state.company_description = company_description
+
+    open("output.html", 'w').close()
 
     if (company_name and company_description):
 
@@ -82,33 +89,42 @@ if st.button('Generate'):
 
         print("All processes have completed successfully, and all changes have been written to the HTML code.")
 
-        # Open and read the HTML file
-        with open('output.html', 'r') as f:
-            html_string = f.read()
-            st.session_state.generated_html = html_string
-
-        # Create a button for exporting the HTML file
-        # Check if the file exists
-        if os.path.exists("output.html"):
-            # Read the file
-            with open("output.html", "r") as file:
-                file_content = file.read()
-
-            # Create a button for downloading the file
-            st.download_button(
-                label="Export",
-                data=file_content,
-                file_name="output.html",
-                mime="text/html",
-            )
-        else:
-            st.write("The file output.html does not exist in the current directory.")
-
-    else:
-        # Open error, cause input's empty
-        with open('error.html', 'r') as f:
-            html_string = f.read()
-
-# Display the generated HTML if it exists in session state
-if st.session_state.generated_html:
+# Open and read the HTML file
+with open('output.html', 'r') as f:
+    html_string = f.read()
+    st.session_state.generated_html = html_string
     components.html(st.session_state.generated_html, height=900)
+
+btn1, btn2, btn3 = st.columns(3)
+
+with btn1:
+    with st.popover("Export"):
+        filename = st.text_input(label="Enter filename", key='filename2')
+        if st.download_button(
+            label="Export",
+            data=st.session_state.edited_content,
+            file_name=filename,
+            key=f"Download"
+        ):
+            st.success("Download started!")
+
+with btn2:
+    with st.popover("Save to account"):
+        if st.session_state.account:
+            filename = st.text_input(label="Enter filename", key='filename1')
+            if st.button(label="Submit"):
+                with sqlite3.connect(st.session_state.db_path) as db:
+                    cursor = db.cursor()
+                    cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, st.session_state.generated_html))
+                    file_id = cursor.lastrowid
+                    cursor.execute("INSERT INTO user_files (user_id, file_id) VALUES (?, ?)", (st.session_state.account_id, file_id))
+                    db.commit()
+                st.success(f"File added to the database with file_id: {file_id}")
+                st.success("Saved to your account. Visit the login page to see.")
+        else:
+            st.error("Login to save your files.")
+
+with btn3:
+    if st.button(label="Edit", help="Open this file in code editor"):
+        st.session_state.edited_content = st.session_state.generated_html
+        st.success("Opened in Web Editor!")

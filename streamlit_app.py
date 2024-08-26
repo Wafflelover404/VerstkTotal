@@ -11,11 +11,12 @@ if 'context' not in st.session_state:
 
 # Define paths to the pages
 PAGE_PATHS = {
-    "Welcome !": "welcome_page.py",
+    "Welcome page !": "welcome_page.py",
+    "Login": "login.py",
     "Configure": "config.py",
     "Generate a template": "interface.py",
-    "Construct a site": "coming_soon.py",
-    "Edit your site": "editor.py"
+    "Build a template": "coming_soon.py",
+    "Edit page": "editor.py"
 }
 
 def load_page(path):
