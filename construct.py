@@ -5,8 +5,6 @@ import requests
 from io import BytesIO
 from requests.exceptions import RequestException
 
-# set's the config of StApp
-st.set_page_config(layout="wide")
 st.markdown("""
 <style>
 .main > div {
