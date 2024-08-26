@@ -15,7 +15,7 @@ PAGE_PATHS = {
     "Login": "login.py",
     "Configure": "config.py",
     "Generate a template": "interface.py",
-    "Build a template": "coming_soon.py",
+    "Build a template": "construct.py",
     "Edit page": "editor.py"
 }
 
