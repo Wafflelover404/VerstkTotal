@@ -25,7 +25,7 @@ with st.popover("Compare code"):
 
     with inp2:
         right_code = st.text_area("2nd code")
-
+    
     opts = {
         "mode": "python",
         "theme": "default",

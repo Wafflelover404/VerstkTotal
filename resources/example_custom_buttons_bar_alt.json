@@ -23,13 +23,6 @@
     "style": {"bottom": "50%", "right": "0.4rem"}
   },
   {
-    "name": "Save to account",
-    "feather": "Save",
-    "hasText": true,
-    "commands": ["save-state"],
-    "style": {"bottom": "40%", "right": "0.4rem"}
-  },
-  {
     "name": "Run",
     "feather": "Play",
     "primary": true,

@@ -5,7 +5,7 @@ import streamlit as st
 hf_token = st.session_state.get("hf_token", "") # replace with your HuggingFace API key
 print(hf_token)
 
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
 headers = {"Authorization": f"Bearer {hf_token}"}
 
 def query(payload):
