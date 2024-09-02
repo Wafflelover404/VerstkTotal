@@ -5,6 +5,8 @@ import requests
 from io import BytesIO
 from requests.exceptions import RequestException
 
+# set's the config of StApp
+st.set_page_config(layout="wide")
 st.markdown("""
 <style>
 .main > div {
@@ -24,6 +26,15 @@ if 'input_page' not in st.session_state:
 <body>
 </body>
 </html>"""
+
+BASIC_TEXT_HTML = '<p>Text</p>'
+BASIC_TEXT_CSS = """    
+    color: #000000;
+	text-align: center;
+"""
+
+BASIC_IMAGE_HTML = '<img src=https://avatars.mds.yandex.net/i?id=1e46b68df1fd4b9859fe99237f675930b8f1adb6-5079356-images-thumbs&n=13>'
+BASIC_IMAGE_CSS = 'text-align: center;'
 
 
 # gets ready components
@@ -104,8 +115,8 @@ def get_class_params(page, edited_class, type):
             'align-index': align_index
         }
     elif type == 'image':
-        html = html[html.find("config"):]
-        url = html[html.find("config") + 4:html.find('>')]
+        html = html[html.find("src"):]
+        url = html[html.find("src") + 4:html.find('>')]
         get_image_dimensions(url)
         orig_w = st.session_state.form_data[1]['orig_w']
         orig_h = st.session_state.form_data[1]['orig_h']
@@ -128,7 +139,6 @@ def get_class_params(page, edited_class, type):
                 frame_res_wp = int(width_str[width_str.find("width:") + 6:width_str.find("%")])
                 res_wp = round(100 / frame_res_wp * res_wp)
             css2 = css2[css2.find("%") + 2:]
-            print(css2)
             res_hp = int(css2[css2.find("height:") + 7:css2.find("%")])
             rt = "%"
             rt_index = 1
@@ -166,6 +176,23 @@ def get_class_params(page, edited_class, type):
             'res-hp': res_hp,
             'align': align,
             'align-index': align_index
+        }
+    elif type == 'group':
+        justify = css[css.find("justify-content"):]
+        justify = justify[justify.find(":") + 2: justify.find(';')]
+        if justify == 'left':
+            justify_index = 0
+        elif justify == 'center':
+            justify_index = 1
+        elif justify == 'right':
+            justify_index = 2
+        elif justify == 'space around':
+            justify_index = 3
+        elif justify == 'space between':
+            justify_index = 4
+        st.session_state.form_data[3] = {
+            'justify': justify,
+            'justify-index': justify_index
         }
     if css.find("padding") > 0:
         padding_str = css[css.find("padding:"):]
@@ -241,63 +268,50 @@ def find_html_and_css(page, obj):
     scope_index = raw_page.find("}") + class_css
     css = page[class_css:scope_index + 2]
 
-    html_start = 0
-    html_end = 0
-    raw_page = page
-    new_class = ""
-    if obj.endswith("img"):
-        html = None
-    else:
-        while new_class != obj:
-
-            html_start = raw_page.find("<div")
-            html_end = raw_page.find("</div>") + 5
-            end = raw_page.find(">")
-            new_class = raw_page[html_start:end]
-            new_class = new_class[new_class.find("=") + 1:]
-            new_class = new_class.replace(" ", "")
-            if new_class == obj:
-                break
-            raw_page = raw_page[end + 1:]
-            start = raw_page.find("class")
-            end = raw_page.find(">")
-            while end < start:
-                raw_page = raw_page[end + 1:]
-                start = raw_page.find("class")
-                end = raw_page.find(">")
-        html = raw_page[html_start - 1:html_end + 2]
-
+    page = page[page.find('<body>'):page.find('</body>')]
+    page = page[page.find(obj)-12:]
+    for i in range(1, len(page)+1):
+        test_page = page[:i]
+        if test_page.count('class') == test_page.count('</div>') and test_page.count('class') != 0:
+            html = test_page
+            break
     return html, css
 
-
-def find_classes(page):  # rewrite
-    body = page.find("<body>") + 6
-    page = page[body:]
+def find_all_classes(page):
     found_classes = []
-    # finding classes
+    page = page[page.find('<body>') + 6:page.find('</body>')]
     while page.find("class") > -1:
-
-        start = page.find("class")
-        end = page.find(">")
-        new_class = page[start:end]
+        page = page[page.find("class"):]
+        new_class = page[page.find("class"):page.find(">")]
         new_class = new_class[new_class.find("=") + 1:]
         new_class = new_class.replace(" ", "")
         if new_class not in found_classes:
             found_classes.append(new_class)
+        page = page[page.find("class")+5:]
+    return found_classes
 
-        page = page[end + 1:]
-        start = page.find("class")
-        end = page.find(">")
-        while end < start:
-            page = page[end + 1:]
-            start = page.find("class")
-            end = page.find(">")
-
+def find_sibling_classes(page):
+    if page.find("<body>") != -1:
+        page = page[page.find('<body>') + 6:page.find('</body>')]
+    else:
+        page = page[page.find("class") + 5:]
+        page = page[:-6]
+    found_classes = []
+    # finding classes
+    while page.find("class") > -1:
+        page = page[page.find("class"):]
+        if page.count('class') == page.count('</div'):
+            new_class = page[page.find("class"):page.find(">")]
+            new_class = new_class[new_class.find("=") + 1:]
+            new_class = new_class.replace(" ", "")
+            if new_class not in found_classes:
+                found_classes.append(new_class)
+        page = page[page.find("class") + 5:]
     return found_classes
 
 
-classes = find_classes(st.session_state.input_page)
-
+classes = find_sibling_classes(st.session_state.input_page)
+all_classes = find_all_classes(st.session_state.input_page)
 
 # creates text element with form parameters
 def create_text(text, color, bold, italic, under, size, align):
@@ -324,7 +338,7 @@ def create_text(text, color, bold, italic, under, size, align):
 # creates image element with form parameters
 def create_image(url, rt, res_w, res_h, align):
     css_string = f"\ttext-align: {align};\n"
-    string = f'<img config={url}>'
+    string = f'<img src={url}>'
     css_image = ''
     if not isNative:
         if isFrame and rt == '%':
@@ -335,7 +349,12 @@ def create_image(url, rt, res_w, res_h, align):
         css_string = add_frame('image', css_string)
     return string, css_string, css_image
 
-
+def create_group(justify):
+    css_string = f"\twidth: 100%;\n\tdisplay: flex;\n\tjustify-content: {justify};\n"
+    string = ''
+    if isFrame:
+        css_string = add_frame('group', css_string)
+    return string, css_string
 # adds frame to element if needed
 def add_frame(type, css):
     css += f"\tpadding: {padding}px;\n"
@@ -363,16 +382,16 @@ def add_frame(type, css):
 
 # adds new class with given type
 def add_class(page, type):
-    global classes
+    global all_classes
 
     new_class = 0
     if type == 'text':
         if text_to_add == '':
             return
         new_class = 'p0'
-        for i in range(len(classes) - 1, -1, -1):
-            if classes[i].startswith("p"):
-                new_class = 'p' + str(int(classes[i][1:]) + 1)
+        for i in range(len(all_classes) - 1, -1, -1):
+            if all_classes[i].startswith("p"):
+                new_class = 'p' + str(int(all_classes[i][1:]) + 1)
                 break
 
         new_html, new_css = create_text(text_to_add, color_text, isBold, isItalic, isUnder, text_size, alignment)
@@ -387,12 +406,14 @@ def add_class(page, type):
             res_w = st.session_state.form_data[1]['res-wp']
             res_h = st.session_state.form_data[1]['res-hp']
         new_class = 'i0'
-        for i in range(len(classes) - 1, -1, -1):
-            if classes[i].startswith("i"):
-                new_class = 'i' + str(int(classes[i][1:]) + 1)
+        for i in range(len(all_classes) - 1, -1, -1):
+            if all_classes[i].startswith("i"):
+                new_class = 'i' + str(int(all_classes[i][1:]) + 1)
                 break
         new_html, new_css, image_css = create_image(image_url, resolution_type, res_w, res_h, alignment)
-
+    elif type == 'group':
+        new_class = st.session_state.preclass
+        new_html, new_css = create_group(justify_content)
     new_css = f".{new_class}" + "{\n" + new_css + "}\n</style>"
     new_html = f"\t<div class={new_class}>\n\t\t{new_html}\n\t</div>\n</body>"
     page = page.replace("</style>", new_css)
@@ -401,14 +422,14 @@ def add_class(page, type):
         image_css = f".{new_class} img" + "{\n" + image_css + "}\n</style>"
         page = page.replace("</style>", image_css)
 
-    classes.append(new_class)
+    all_classes.append(new_class)
     return page
 
 
 # edit class by replacing old html with new one
 def edit_class(page, type, edited_class):
     html, css = find_html_and_css(page, edited_class)
-
+    image_css = None
     if type == 'text':
         if text_to_add == '':
             return
@@ -424,14 +445,17 @@ def edit_class(page, type, edited_class):
             res_w = st.session_state.form_data[1]['res-wp']
             res_h = st.session_state.form_data[1]['res-hp']
         new_html, new_css, image_css = create_image(image_url, resolution_type, res_w, res_h, alignment)
-
-    new_css = f".{edited_class}" + "{\n" + new_css + "}\n</style>"
-    new_html = f"\t<div class={edited_class}>\n\t\t{new_html}\n\t</div>\n</body>"
-    page = page.replace(html, new_html)
+    elif type == 'group':
+        new_html, new_css = create_group(justify_content)
+    new_css = f".{edited_class}" + "{\n" + new_css + "}\n"
+    if type != 'group':
+        new_html = f"\t<div class={edited_class}>\n\t\t{new_html}\n\t</div>\n"
+        page = page.replace(html, new_html)
     if image_css is not None:
-        image_css = f".{edited_class} img" + "{\n" + image_css + "}\n</style>"
-        new_css += image_css
-    page = page.replace(html, new_css)
+        q, img_css = find_html_and_css(page, edited_class + ' img')
+        image_css = f".{edited_class} img" + "{\n" + image_css + "}\n"
+        page = page.replace(img_css, image_css)
+    page = page.replace(css, new_css)
     return page
 
 
@@ -443,21 +467,7 @@ def delete_class(page, html, css):
 
 
 def create_ready_class(type, html, css):
-    global classes
-
-    new_class = 0
-    if type == 'text':
-        new_class = 'p0'
-        for i in range(len(classes) - 1, -1, -1):
-            if classes[i].startswith("p"):
-                new_class = 'p' + str(int(classes[i][1:]) + 1)
-                break
-    elif type == 'image':
-        new_class = 'i0'
-        for i in range(len(classes) - 1, -1, -1):
-            if classes[i].startswith("i"):
-                new_class = 'i' + str(int(classes[i][1:]) + 1)
-                break
+    new_class = get_class(type)
     if type == 'image':
         css_copy = css
         css = css_copy[:css_copy.find('&')]
@@ -469,10 +479,49 @@ def create_ready_class(type, html, css):
     return new_class, html, css
 
 
+
+
 def add_ready_class(page, new_class, html, css):
     page = page.replace("</style>", css + '</style>')
     page = page.replace("</body>", html + '</body>')
-    classes.append(new_class)
+    all_classes.append(new_class)
+    return page
+
+
+def get_class(type):
+    if type == 'text':
+        new_class = 'p0'
+        for i in range(len(all_classes) - 1, -1, -1):
+            if all_classes[i].startswith("p"):
+                new_class = 'p' + str(int(all_classes[i][1:]) + 1)
+                break
+    elif type == 'image':
+        new_class = 'i0'
+        for i in range(len(all_classes) - 1, -1, -1):
+            if all_classes[i].startswith("i"):
+                new_class = 'i' + str(int(all_classes[i][1:]) + 1)
+                break
+    elif type == 'group':
+        new_class = 'g0'
+        for i in range(len(all_classes) - 1, -1, -1):
+            if all_classes[i].startswith("g"):
+                new_class = 'g' + str(int(all_classes[i][1:]) + 1)
+                break
+    return new_class
+
+def add_in_group(page, group, new_class, type):
+    group_html, group_css = find_html_and_css(page, group)
+    group_html = group_html[:group_html.rfind('</div>')]
+    if type == 'image':
+        css = f".{new_class}" + "{\n" + BASIC_IMAGE_CSS + "}\n"
+        css += f".{new_class} img" + "{\n}\n</style>"
+        html = f"\t<div class={new_class}>\n\t\t{BASIC_IMAGE_HTML}\n\t</div>\n"
+    if type == 'text':
+        css = f".{new_class}" + "{\n" + BASIC_TEXT_CSS + "}\n</style>"
+        html = f"\t<div class={new_class}>\n\t\t{BASIC_TEXT_HTML}\n\t</div>\n"
+
+    page = page.replace(group_html, group_html + html)
+    page = page.replace('</style>', css)
     return page
 
 
@@ -515,6 +564,9 @@ def clear_form():
         'thick': 2,
         'round': 10,
         'borderColor': '#000000'
+    }, {
+        'justify': 'left',
+        'justify-index': 0
     }]
 
 
@@ -532,6 +584,8 @@ if not st.session_state.edit_mode:
         st.session_state.header = "Add text"
     if st.session_state.type == 'image':
         st.session_state.header = "Add image"
+    if st.session_state.type == 'group':
+        st.session_state.header = "Add group"
 
 if 'choose_element' not in st.session_state:
     st.session_state.choose_element = False
@@ -539,7 +593,8 @@ if 'not_working' not in st.session_state:
     st.session_state.not_working = False
 if 'custom_elements' not in st.session_state or st.session_state.not_working:
     st.session_state.custom_elements = None
-
+if 'group_classes' not in st.session_state:
+    st.session_state.group_classes = []
 if 'button_pressed' not in st.session_state:
     st.session_state.button_pressed = None
 if 'editing_class' not in st.session_state:
@@ -550,11 +605,12 @@ st.header("HTML constructor")
 
 # adding buttons
 with st.container(border=True):
-    col1, col2, col3, space, col4 = st.columns([1, 1.2, 2.2, 11.8, 2])
+    col1, col2, col3, col4, space, col5 = st.columns([1, 1.2, 1.2, 2.2, 10.6, 2])
     add_text = col1.button("Add text")
     add_image = col2.button("Add image")
-    custom_el = col3.button("Choose custom element")
-    download = col4.download_button(label="Download HTML code", data=st.session_state.input_page, file_name="page.html",
+    add_group = col3.button("Add group")
+    custom_el = col4.button("Choose custom element")
+    download = col5.download_button(label="Download HTML code", data=st.session_state.input_page, file_name="page.html",
                                     mime='text/html')
 
 # main gui
@@ -714,7 +770,6 @@ with st.container():
                             st.write("Url field is empty")
                         else:
                             st.write("It's invalid url")
-
                 isFrame = st.checkbox("Add frame", value=st.session_state.form_data[2]['frame'])
                 if isFrame:
                     if st.session_state.type == 'text':
@@ -747,6 +802,57 @@ with st.container():
                                           value=st.session_state.form_data[2]['thick'], disabled=not hasBorder)
                     rounding = st.slider("Border rounding", min_value=0, max_value=20,
                                          value=st.session_state.form_data[2]['round'], disabled=not hasBorder)
+                if st.session_state.type == 'group':
+                    justify_content = st.selectbox("Select items placement",
+                                                   ["left", "center", "right", "space-around", "space-between"],
+                                                   index=st.session_state.form_data[3]['justify-index'],
+                                                   key=st.session_state.form_data[3]['justify'])
+                    if st.session_state.header.startswith("Edit"):
+                        group_html, group_css = find_html_and_css(st.session_state.input_page,
+                                                                  st.session_state.header[5:])
+                        st.session_state.group_classes = find_sibling_classes(group_html)
+
+                    for i, label in enumerate(st.session_state.group_classes):
+                        col1, col2 = st.columns(2)
+                        if col1.button(label, key=label):
+                            st.session_state.button_pressed = label
+                        if st.session_state.button_pressed:
+                            editing = st.session_state.button_pressed
+                            st.session_state.editing_class = editing
+                            st.session_state.button_pressed = None
+                            st.rerun()
+                        if col2.button("Delete", key='del' + label):
+                            st.session_state.button_pressed = label
+                            if st.session_state.button_pressed:
+                                editing = st.session_state.button_pressed
+                                st.session_state.editing_class = editing
+                                st.session_state.button_pressed = None
+                            html, css = find_html_and_css(st.session_state.input_page, st.session_state.editing_class)
+                            st.session_state.input_page = delete_class(st.session_state.input_page, html, css)
+                            if st.session_state.editing_class.startswith('i'):
+                                html, css = find_html_and_css(st.session_state.input_page,
+                                                              st.session_state.editing_class + ' img')
+                                st.session_state.input_page = delete_class(st.session_state.input_page, html, css)
+                            st.session_state.editing_class = None
+                            st.session_state.edit_mode = False
+                            st.session_state.group_classes.remove(label)
+                            clear_form()
+                            st.rerun()
+                    col3, col4 = st.columns(2)
+                    type_select = col3.selectbox("type of element", ['text', 'image'])
+                    submit_element = col4.button("Add element")
+                    if submit_element:
+                        new_class = get_class(type_select)
+                        st.session_state.group_classes.append(new_class)
+                        if st.session_state.preclass not in all_classes:
+                            st.session_state.input_page = add_class(st.session_state.input_page, 'group')
+                        if st.session_state.header.startswith("Edit"):
+                            st.session_state.input_page = add_in_group(st.session_state.input_page,st.session_state.header[5:], new_class, type_select)
+                        else:
+                            st.session_state.input_page = add_in_group(st.session_state.input_page, st.session_state.preclass, new_class, type_select)
+                        st.rerun()
+
+
 
                 if st.session_state.type == 'image':
                     submit = st.button("Submit", disabled=not is_image_url(image_url))
@@ -754,7 +860,10 @@ with st.container():
                     submit = st.button("Submit")
                 if submit:
                     if not st.session_state.edit_mode:
-                        st.session_state.input_page = add_class(st.session_state.input_page, st.session_state.type)
+                        if st.session_state.type != 'group':
+                            st.session_state.input_page = add_class(st.session_state.input_page, st.session_state.type)
+                        elif st.session_state.preclass in all_classes:
+                            st.session_state.input_page = edit_class(st.session_state.input_page, st.session_state.type, st.session_state.preclass)
                         clear_form()
                         st.rerun()
                     else:
@@ -807,6 +916,9 @@ if edit:
             st.session_state.type = 'text'
         elif st.session_state.editing_class.startswith("i"):
             st.session_state.type = 'image'
+        elif st.session_state.editing_class.startswith("g"):
+            st.session_state.type = 'group'
+            st.session_state.group_classes = []
         get_class_params(st.session_state.input_page, st.session_state.editing_class, st.session_state.type)
         st.session_state.edit_mode = True
         st.session_state.choose_element = False
@@ -821,6 +933,15 @@ if add_text:
 
 if add_image:
     st.session_state.type = 'image'
+    st.session_state.editing_class = None
+    st.session_state.choose_element = False
+    clear_form()
+    st.rerun()
+
+if add_group:
+    st.session_state.group_classes = []
+    st.session_state.preclass = get_class('group')
+    st.session_state.type = 'group'
     st.session_state.editing_class = None
     st.session_state.choose_element = False
     clear_form()
