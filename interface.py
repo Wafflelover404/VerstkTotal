@@ -1,24 +1,19 @@
-# Page generation
-
-import requests
-import re
-from bs4 import BeautifulSoup
-import random
 import streamlit as st
 import streamlit.components.v1 as components
 import os
-import subprocess
 import sqlite3
-
-import text_writer  # For page's text
-import get_image_topic  # For image's topic
-from search_image import get_image_urls  # Image search function
+import text_writer
+import get_image_topic
+from search_image import get_image_urls
+import random
 
 # Initialize session state
 if 'account' not in st.session_state:
     st.session_state.account = ""
 if 'edited_content' not in st.session_state:
     st.session_state.edited_content = ""
+if 'generated_html' not in st.session_state:
+    st.session_state.generated_html = ""
 
 ready = False
 
@@ -44,14 +39,12 @@ if 'company_name' not in st.session_state:
     st.session_state.company_name = ""
 if 'company_description' not in st.session_state:
     st.session_state.company_description = ""
-if 'generated_html' not in st.session_state:
-    st.session_state.generated_html = ""
 
 # Create an input field for the company names
-company_name = st.text_input("Enter the company name", value=st.session_state.company_name)
+company_name = st.text_input("Enter the page topic", value=st.session_state.company_name)
 
 # Create an input field for the company description
-company_description = st.text_area("Enter the company description", value=st.session_state.company_description)
+company_description = st.text_area("Enter the page description", value=st.session_state.company_description)
 
 # Create a button
 if st.button('Generate'):
@@ -101,45 +94,44 @@ if st.button('Generate'):
                 print(f"An error occurred: {e}")
 
             print("All processes have completed successfully, and all changes have been written to the HTML code.")
-            ready = True
 
-if ready:
-    # Open and read the HTML file
-    with open('output.html', 'r') as f:
-        html_string = f.read()
-        st.session_state.generated_html = html_string
-        components.html(st.session_state.generated_html, height=900)
+            with open('output.html', 'r') as f:
+                html_string = f.read()
+                st.session_state.generated_html = html_string
 
-    btn1, btn2, btn3 = st.columns(3)
+if st.session_state.generated_html:
+    components.html(st.session_state.generated_html, height=900)
 
-    with btn1:
-        with st.popover("Export"):
-            filename = st.text_input(label="Enter filename", key='filename2')
-            if st.download_button(
-                label="Export",
-                data=st.session_state.edited_content,
-                file_name=filename,
-                key=f"Download"
-            ):
-                st.success("Download started!")
+    tab_download, tab_save, tab_edit = st.tabs(["Download", "Save", "Edit"])
 
-    with btn2:
-        with st.popover("Save to account"):
-            if st.session_state.account:
-                filename = st.text_input(label="Enter filename", key='filename1')
-                if st.button(label="Submit"):
-                    with sqlite3.connect(st.session_state.db_path) as db:
-                        cursor = db.cursor()
-                        cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, st.session_state.generated_html))
-                        file_id = cursor.lastrowid
-                        cursor.execute("INSERT INTO user_files (user_id, file_id) VALUES (?, ?)", (st.session_state.account_id, file_id))
-                        db.commit()
+    # Save Tab
+    with tab_download:
+        filename = st.text_input(label="Enter filename", key='filename2')
+        if st.download_button(
+            label="Export",
+            data=st.session_state.get('edited_content', ''),
+            file_name=filename,
+            key="Download"
+        ):
+            st.success("Download started!")
+
+    # Download Tab
+    with tab_save:
+        if st.session_state.get('account', ''):
+            filename = st.text_input(label="Enter filename", key='filename1')
+            if st.button(label="Submit"):
+                with sqlite3.connect(st.session_state.db_path) as db:
+                    cursor = db.cursor()
+                    cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, st.session_state.generated_html))
+                    file_id = cursor.lastrowid
+                    cursor.execute("INSERT INTO user_files (user_id, file_id) VALUES (?, ?)", (st.session_state.account_id, file_id))
+                    db.commit()
                     st.success(f"File added to the database with file_id: {file_id}")
                     st.success("Saved to your account. Visit the login page to see.")
-            else:
-                st.error("Login to save your files.")
+        else:
+            st.error("Login to save to account")
 
-    with btn3:
+    with tab_edit:
         if st.button(label="Edit", help="Open this file in code editor"):
             st.session_state.edited_content = st.session_state.generated_html
             st.success("Opened in Web Editor!")

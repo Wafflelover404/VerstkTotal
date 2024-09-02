@@ -1,119 +1,143 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Your Website Title</title>
-    <meta charset="UTF-8">
-    <meta name="description" content="This is a simple HTML header">
-    <meta name="keywords" content="HTML, CSS, JavaScript">
-    <meta name="author" content="Your Name">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+	<meta charset="utf-8">
+	<style>
+		body {
+			margin: 0;
+			font-family: Monospace
+		}
+		header {
+			display: flex;
+			width: 100%;
+			height: 7vh;
+			align-items: center;
+			justify-content: center;
+			background-color: #141414;
+		}
+		a {
+			font-size: 135%;
+			color: #949494;
+			text-decoration: none;
+			transition: color 0.2s ease-out, font-size 0.3s ease-out; /* Add this line */
+		}
 
-        .navbar {
-            overflow: hidden;
-            background-color: #333;
-            background-color: black;
-        }
+		a:hover {
+			color: white;
+			font-size: 135%;
+			font-weight: bold;
+		}
+		.buttons{
+			font-weight: normal;
+			display: flex;
+			justify-content: space-around;
+			width: 40%;
+		}
 
-        .navbar a {
-            float: left;
-            display: block;
-            color: whitesmoke;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        .navbar a:hover {
-            transition: color 0.3s ease-out, font-size 0.3s ease-out;
-            font-size: 20px;
-            color: white;
-        }
-    </style>
+	</style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="#">Home</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
-    </div>
+	<header>
+		<div class="buttons">
+			<a href="">Home</a>
+			<a href="">Our products</a>
+			<a href="">Learn more</a>
+			<a href="">Contacts</a>
+		</div>
+	</header>
 </body>
 </html>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<style>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap");
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
-.about-us {
-  background-image: url("&Horizontal-image&");
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.text-box {
-  padding: 40px;
-  border-radius: 5px;
-  max-width: 1300px;
-  text-align: center;
-  position: relative;
-  z-index: 9999;
-    background: rgba(240, 240, 240, 0.1);
-}
-.text-box::before {
-    background: #fff;
-}
-.text-box h2 {
-  font-size: 70px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-.text-box p {
-  font-size: 50px;
-  line-height: 60px;
-  letter-spacing: 1px;
-  word-wrap: break-word;
-}
-.data {
-  margin-top: 40px;
-}
-.hire-btn {
-  background: #e63c74;
-  color: #fff;
-  text-decoration: none;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 4px;
-  font-size: 30px;
-  transition: 0.5s;
-  cursor: pointer;
-}
-.hire-btn:hover {
-  background: #ff0055;
-}
-</style>
-</head>
-<body>
-<section class="about-us">
-    <div class="text-box">
-      <h2>Waffles</h2>
-      <p>At Waffles, we pride ourselves on serving delicious, freshly made waffles to our valued customers every day. Our commitment to quality and customer satisfaction sets us apart in the food industry.</p>
-      <div class="data">
-        <a href="#" class="hire-btn">Read More</a>
-      </div>
-    </div>
-</section>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>An About Us Page | CoderGirl</title>
+        <!---Custom Css File!--->
+        <link rel="stylesheet" href="style.css" />
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap");
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Poppins", sans-serif;
+            }
+            .about-us {
+                height: 100vh;
+                width: 100%;
+                padding: 90px 0;
+                background: #ddd;
+            }
+            .vertical-image {
+                height: auto;
+                width: 302px;
+                filter: blur(10px);
+                -webkit-filter: blur(8px);
+            }
+            .about {
+                width: 1130px;
+                max-width: 85%;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+            }
+            .text {
+                width: 540px;
+            }
+            .text h2 {
+                font-size: 90px;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+            .text h5 {
+                font-size: 22px;
+                font-weight: 500;
+                margin-bottom: 20px;
+            }
+            span {
+                color: #4070f4;
+            }
+            .text p {
+                font-size: 18px;
+                line-height: 25px;
+                letter-spacing: 1px;
+            }
+            .data {
+                margin-top: 30px;
+            }
+            .hire {
+                font-size: 18px;
+                background: #4070f4;
+                color: #fff;
+                text-decoration: none;
+                border: none;
+                padding: 8px 25px;
+                border-radius: 6px;
+                transition: 0.5s;
+            }
+            .hire:hover {
+                background: #000;
+                border: 1px solid #4070f4;
+            }
+        </style>
+    </head>
+    <body>
+        <section class="about-us">
+            <div class="about">
+                <img src="https://pixabay.com/get/g7cda90cc5898c0d55ff9ef79d7f57637cc025a328a57e0fe578f16225e7ed3f20e0cba198a9a7168c54f8475eb559d772dc3e82997ec6ab3d128c6d7419a27f9_640.jpg" class="vertical-image" >
+                <div class="text">
+                    <h2>Waffes</h2>
+                    <p>
+                         Waffles have a rich history dating back to the 14th century in the Netherlands. Originally a flat, round cake cooked between iron plates, waffles evolved over time, eventually taking on their characteristic square shape and deep pockets in the 18th century. This iconic breakfast food has since become a beloved treat around the world.
+                    </p>
+                    <div class="data">
+                        <a href="#" class="hire">read more</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
 </html>

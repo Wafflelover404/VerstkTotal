@@ -14,6 +14,10 @@ if 'account' not in st.session_state:
     st.session_state.account = ""
 if 'account_id' not in st.session_state:
     st.session_state.account_id = ""
+if 'change' not in st.session_state:
+    st.session_state.change = True
+st.session_state["hf_token"] = st.secrets.hf_token
+st.session_state["px_token"] = st.secrets.px_token
 
 # Define paths to the pages
 PAGE_PATHS = {

@@ -4,9 +4,9 @@ st.title("Configure everything here")
 
 st.markdown("Don't worry, we respect your privacy 🤫", help="All tokens are stored locally in session and accessible by user only.")
 st.divider()
-Change = st.checkbox("Use public tokens", help="Uncheck to use your own tokens. Your own tokens give better perfomance.", value=True)
+st.session_state.change = st.checkbox("Use public tokens", help="Uncheck to use your own tokens. Your own tokens give better perfomance.", value=True)
 
-if not Change:
+if not st.session_state.change:
     st.session_state["hf_token"] = ""
     st.session_state["px_token"] = ""
     
