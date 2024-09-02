@@ -75,7 +75,7 @@ def get_file_data_as_json(cursor, file_id):
         return json.dumps({"error": "File not found"}, indent=4)
 
 # Ensure the database directory exists
-db_path = './Data/DB/app.db'
+db_path = st.session_state.db_path
 if not os.path.exists(os.path.dirname(db_path)):
     os.makedirs(os.path.dirname(db_path))
 

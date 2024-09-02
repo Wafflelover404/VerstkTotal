@@ -4,6 +4,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 from requests.exceptions import RequestException
+import sqlite3
 
 st.markdown("""
 <style>
@@ -603,13 +604,36 @@ st.header("HTML constructor")
 
 # adding buttons
 with st.container(border=True):
-    col1, col2, col3, col4, space, col5 = st.columns([1, 1.2, 1.2, 2.2, 10.6, 2])
+    col1, col2, col3, col4, space, entername, col5, col6, col7 = st.columns([1.2, 1.4, 1.4, 2.4, 3, 1.4, 2.3, 0.9, 1])
     add_text = col1.button("Add text")
     add_image = col2.button("Add image")
     add_group = col3.button("Add group")
     custom_el = col4.button("Choose custom element")
-    download = col5.download_button(label="Download HTML code", data=st.session_state.input_page, file_name="page.html",
+    filename = entername.text_input(label="", label_visibility="collapsed", value="file.html")
+    download = col5.download_button(label="Download HTML code", data=st.session_state.input_page, file_name=filename,
                                     mime='text/html')
+    save = col6.button("Save", help="Save to current account")
+    edit = col7.button("Edit", help="Open in Web Editor")
+    
+
+db_path = st.session_state.db_path
+
+if edit:
+    st.session_state.edited_content = st.session_state.input_page
+    st.success("Opened in Web Editor!")
+        
+if save:
+    if st.session_state.account:
+        with sqlite3.connect(st.session_state.db_path) as db:
+            cursor = db.cursor()
+            cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, st.session_state.input_page))
+            file_id = cursor.lastrowid
+            cursor.execute("INSERT INTO user_files (user_id, file_id) VALUES (?, ?)", (st.session_state.account_id, file_id))
+            db.commit()
+        st.success(f"File added to the database with file_id: {file_id}")
+        st.success("Saved to your account. Visit the login page to see.")
+    else:
+        st.error("Login to save your files.")
 
 # main gui
 with st.container():

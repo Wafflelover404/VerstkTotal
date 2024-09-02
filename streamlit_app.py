@@ -8,6 +8,12 @@ if 'px_token' not in st.session_state:
     st.session_state.px_token = ""
 if 'context' not in st.session_state:
     st.session_state.context = False
+if 'db_path' not in st.session_state:
+    st.session_state.db_path = './Data/DB/app.db'
+if 'account' not in st.session_state:
+    st.session_state.account = ""
+if 'account_id' not in st.session_state:
+    st.session_state.account_id = ""
 
 # Define paths to the pages
 PAGE_PATHS = {
