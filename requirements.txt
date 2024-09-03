@@ -1,6 +1,6 @@
 streamlit_code_editor
 bs4
 bcrypt
-PIL
+Pillow
 requests
 io
