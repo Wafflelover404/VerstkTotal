@@ -4,6 +4,9 @@ from code_editor import code_editor
 import base64
 import sqlite3
 import streamlit.components.v1 as components
+from login import get_user_id_by_username
+from login import get_file_ids_by_user_id
+from login import get_file_data_as_json
 
 # Initialize session state variables
 if 'uploaded_file_content' not in st.session_state:
@@ -45,16 +48,46 @@ btns = custom_buttons_alt
 st.title("VerstkEdit")
 st.markdown("A simple website editor")
 
-upload, start, load = st.columns(3)
+upload, load = st.columns([3, 3])
 
 with upload:
-    uploaded_file = st.file_uploader("Choose your HTML file.")
+    with st.container(border=True, height=325):
+        uploaded_file = st.file_uploader(label="Choose your HTML file.", label_visibility="collapsed")
+        st.subheader("Or")
+        st.write("Use generator, constructor")
+        st.subheader("Or")
+        if st.button("Create new file"):
+            st.session_state.edited_content = ""
+        
 
-with start:
-    st.write("You can use our template generator or constructor")
-    st.subheader("Or")
-    if st.button("start from scratch"):
-        st.session_state.edited_content = ""
+with load:
+    with st.container(border=True, height=325):
+        if st.session_state.account:
+            with sqlite3.connect(st.session_state.db_path) as db:
+                    cursor = db.cursor()
+                    user_id = get_user_id_by_username(cursor, st.session_state.account)
+                    file_ids = get_file_ids_by_user_id(cursor, user_id)
+                    
+                    if file_ids:
+                        # Create tabs for each file ID
+                        tabs = [f"File ID: {file_id}" for file_id in file_ids]
+                        selected_tab = st.tabs(tabs)
+                        
+                        for file_id, tab_name in zip(file_ids, tabs):
+                            with selected_tab[tabs.index(tab_name)]:
+                                file_json_str = get_file_data_as_json(cursor, file_id)
+                                file_json = json.loads(file_json_str)  # Parse the JSON string into a dictionary
+                                st.write(f"**Filename**: {file_json['filename']}")
+                                st.write("**File contents:**")
+                                with st.expander("View source code"):
+                                    st.code(file_json["content"], line_numbers=True)
+                                if st.button(label="Edit", help="Open this file in code editor", key=f"{file_id}_export"):
+                                    st.session_state.edited_content = file_json["content"]
+                                    st.success("Opened in Web Editor !")
+                    else:
+                        st.write("No files found for this user.")
+        else:
+            st.warning("Login to load project from account")
 
 if uploaded_file is not None:
     st.session_state.uploaded_file_content = uploaded_file.read().decode('utf-8')
