@@ -51,7 +51,7 @@ st.markdown("A simple website editor")
 upload, load = st.columns([3, 3])
 
 with upload:
-    with st.container(border=True, height=325):
+    with st.container(border=True, height=350):
         uploaded_file = st.file_uploader(label="Choose your HTML file.", label_visibility="collapsed")
         st.subheader("Or")
         st.write("Use generator, constructor")
@@ -61,7 +61,7 @@ with upload:
         
 
 with load:
-    with st.container(border=True, height=325):
+    with st.container(border=True, height=350):
         if st.session_state.account:
             with sqlite3.connect(st.session_state.db_path) as db:
                     cursor = db.cursor()
