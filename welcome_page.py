@@ -9,7 +9,7 @@ with st.container():
     gen, edit, space = st.columns([1, 1, 3])
     gen.link_button("Afanasyeff Ivan :black_cat:", "https://github.com/wafflelover404")
     edit.link_button("Vinogradov Timofey :black_cat:", "https://github.com/DolphyXSTD")
-st.markdown("This project is powered by <a href='https://streamlit.io/'>Streamlit :crown:</a> and <a href='https://huggingface.co/'>HuggingFace :hugging_face:</a>.", unsafe_allow_html=True)
+st.markdown("This project is built with <a href='https://streamlit.io/'>Streamlit :crown:</a> and <a href='https://huggingface.co/'>HuggingFace :hugging_face:</a>.", unsafe_allow_html=True)
 st.subheader("Check out the repositories:")
 with st.container():
     gen, edit, space = st.columns([1, 1, 3])
