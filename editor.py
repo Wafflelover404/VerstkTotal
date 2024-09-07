@@ -4,9 +4,12 @@ from code_editor import code_editor
 import base64
 import sqlite3
 import streamlit.components.v1 as components
+import requests
 from login import get_user_id_by_username
 from login import get_file_ids_by_user_id
 from login import get_file_data_as_json
+import difflib
+import re
 
 # Initialize session state variables
 if 'uploaded_file_content' not in st.session_state:
@@ -29,6 +32,14 @@ if 'account' not in st.session_state:
     st.session_state.account = ""
 if 'show_ai_coder' not in st.session_state:
     st.session_state.show_ai_coder = False
+    
+def find_between(s, first, last):
+    try:
+        start = s.find(first) + len(first)
+        end = s.find(last, start)
+        return s[start:end]
+    except ValueError:
+        return ""
 
 # Load custom buttons and CSS
 with open('resources/example_custom_buttons_bar_alt.json') as json_button_file_alt:
@@ -194,42 +205,40 @@ if st.session_state.edited_content is not None:
                 "theme": "default",
             }
 
-            def send(request, hf_token): # This function is used for sending request (Forked from assistant.py).
-                API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-                headers = {"Authorization": f"Bearer {hf_token}"}
+            hf_token = st.session_state.get("hf_token", "") # replace with your HuggingFace API key
 
-                def query(payload):
-                    response = requests.post(API_URL, headers=headers, json=payload)
-                    return response.json()
+            API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
+            headers = {"Authorization": f"Bearer {hf_token}"}
 
-                def replace_assistant(strin):
-                    e = re.sub(r'<\|system\|>.*<\|assistant\|>', '', strin, flags=re.DOTALL)
-                    e = re.sub(r'(?<=\?waffle\?)\S+', '', e)
-                    return e.strip()
+            def query(payload):
+                response = requests.post(API_URL, headers=headers, json=payload)
+                return response.json()
 
-                prompt = f"""
-                    <|system|>
-                    Assistant is an expert in coding. He is specialized in frontend web development. He has to help user by writing code only. RESPOND WITH HTML CODE ONLY.
-                    </s>
-                    <|user|>
-                    {request}
-                    </s>
-                    <|assistant|>
-                    """
-                
-                for _ in range(10):
+            def replace_assistant(strin):
+                e = re.sub(r'<\|system\|>.*<\|assistant\|>', '', strin, flags=re.DOTALL)
+                e = re.sub(r'(?<=\?waffle\?)\S+', '', e)
+                return e.strip()
+
+            def send(prompt):
+                print('generating')
+                print(prompt)
+                for i in range(0, 10):
                     try:
+                        promptd = [{'role': 'system', 'content':""" Assistants helps user with his coding tasks. Assistant can only respond with code.
+                            """}, {'role': 'user', 'content': f'{prompt}'}]
                         response = query({
-                            "inputs": prompt,
-                            "parameters": {"max_new_tokens": 8000, "use_cache": False, "max_time": 120.0},
-                            "options": {"wait_for_model": True}
+                        "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+                            "messages": promptd,
+                            "max_tokens": 8000,
+                            'stream': False
                         })
-                        full_response = replace_assistant(response[0]["generated_text"])
+                        print(response['choices'][0]['message']['content'])
+                        full_response = response['choices'][0]['message']['content']
                         return full_response
+                        break
                     except Exception as e:
                         print(e)
-                        continue
-                
+                        pass
                 return "Error"
 
             # Here starts the streamlit interface for Ai assistant
@@ -237,29 +246,45 @@ if st.session_state.edited_content is not None:
                 st.session_state.hf_token = ""
 
             st.markdown("Ask the assistant any coding-related questions. The assistant has your code as context for your request.")
-            context = st.checkbox("Code context", help="Tick the checkbox to let Ai see your code.")    
-            request = st.text_area(label="")
-            try:
-                if context:
-                    request = f"""
-                        User's request: {request}
+            context = st.checkbox("Code context", help="Tick the checkbox to let Ai use your code as additional data. ")    
+            request = st.text_area(label="", label_visibility="collapsed")
+            if context:
+                request = f"""
+                    User's request: {request}
 
-                        User's code: {UserCode}
-                    """
-                else:
-                    request = f"""
-                        User's request: {request}
-                    """
-                response = send(request, st.session_state.hf_token)
-                if response != "Error":
-                    print("Text writing successfully!", response)
-                    st.write(f"Ai response finished !")
-                    # Display the difference result between user's code and ai's
-                    diff_result = st_codemirror_diff(UserCode, response, opts)
-                else:
-                    print("An error occurred while communicating with TextAi.")
-            except Exception as e:
-                print(f"An error occurred: {e}")
+                    User's code: {UserCode}
+                """
+            else:
+                request = f"""
+                    User's request: {request}
+                """
+            
+            pt1, pt2 = st.columns(2)
+            
+            with pt1:
+                if st.button("Send"):
+                    response = send(request)
+                    if response != "Error":
+                        print("Text writing successfully!", response)
+                        t1 ,t2, t3 = st.tabs(["Assistant's code preview", "User's code preview", "Code changes"])
+                        response = find_between(response, "```", "```")
+                        with pt2:
+                            if response != "":
+                                if st.button("Edit", help="Rewrites your current file with ai generated content"):
+                                    st.session_state.edited_content = response
+                        
+                        with t1:
+                            st.components.v1.html(response, height=750)
+                            
+                        with t2:
+                            st.components.v1.html(st.session_state.edited_content, height=750)
+                            
+                        with t3:
+                            # Display the difference result between user's code and ai's
+                            diff_result = st_codemirror_diff(UserCode, response, opts)
+                            
+                    else:
+                        print("An error occurred while communicating with TextAi.")
                 
 
         if diff_result is not None and diff_result is not "":
