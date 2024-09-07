@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-st.title("Welcome to our project ! :wave:")
+st.title("Welcome to **Constructify** ! :wave:")
 st.subheader("A simple website editor with cool functions of generating web-pages powered by AI algorithms")
 st.header("Developers:")
 st.write("(our github profiles)")
